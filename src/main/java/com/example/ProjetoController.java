@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError; // Para adicionar erros espec�
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public class ProjetoController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private EquipeRepository equipeRepository;
+
     // 1. Exibir todos os projetos
     @GetMapping
     public String listarProjetos(Model model) {
@@ -34,10 +38,11 @@ public class ProjetoController {
 
     // Método auxiliar para adicionar objetos comuns ao modelo (lista de gerentes, status)
     private void addCommonAttributes(Model model) {
-        // <<<<< ALTERAÇÃO AQUI: Buscar APENAS usuários com perfil GERENTE
+
         List<Usuario> gerentes = usuarioRepository.findByPerfil(PerfilUsuario.GERENTE);
         model.addAttribute("gerentes", gerentes); // Renomeei para 'gerentes' para clareza no HTML
         model.addAttribute("statusProjetoEnum", StatusProjeto.values());
+        model.addAttribute("equipes", equipeRepository.findAll());
     }
 
     // 2. Exibir formulário para novo projeto
@@ -62,16 +67,64 @@ public class ProjetoController {
         }
     }
 
+    /* List<Equipe> equipesSelecionadas = null;
+        if (equipeIds != null && !equipeIds.isEmpty()) {
+            equipesSelecionadas = equipeRepository.findAllById(equipeIds);
+        }
+
+        // Limpa as equipes existentes para evitar duplicação ou persistência de equipes removidas
+        if (projeto.getId() != null) {
+            Optional<Projeto> existingProjetoOpt = projetoRepository.findById(projeto.getId());
+            if (existingProjetoOpt.isPresent()) {
+                Projeto existingProjeto = existingProjetoOpt.get();
+                // Desconecta as equipes antigas do lado da Equipe
+                for (Equipe equipe : new ArrayList<>(existingProjeto.getEquipes())) {
+                    equipe.getProjetos().remove(existingProjeto);
+                }
+            }
+        }
+        projeto.setEquipes(new ArrayList<>()); // Limpa a lista antes de adicionar novas
+        if (equipesSelecionadas != null) {
+            for (Equipe equipe : equipesSelecionadas) {
+                projeto.adicionarEquipe(equipe); // Usa o método utilitário para manter a bidirecionalidade
+            }
+        } */
     // 4. Processar o formulário (salvar novo ou atualizar existente)
     @PostMapping
-    public String salvarProjeto(@Valid @ModelAttribute("projeto") Projeto projeto, BindingResult result, RedirectAttributes attributes, Model model) {
+    public String salvarProjeto(@Valid @ModelAttribute("projeto") Projeto projeto, 
+                                BindingResult result, @RequestParam(value = "equipeIds", required = false) List<Long> equipeIds, 
+                                RedirectAttributes attributes, Model model) {
         // Primeiro, as validações padrão do Bean Validation
         if (result.hasErrors()) {
             addCommonAttributes(model);
             return "form-projeto";
         }
+        
+        List<Equipe> equipesSelecionadas = null;
+        if (equipeIds != null && !equipeIds.isEmpty()) {
+            equipesSelecionadas = equipeRepository.findAllById(equipeIds);
+        }
 
-        // <<<<< VALIDAÇÃO PERSONALIZADA: Verificar o perfil do gerente
+        // Limpa as equipes existentes para evitar duplicação ou persistência de equipes removidas
+        if (projeto.getId() != null) {
+            Optional<Projeto> existingProjetoOpt = projetoRepository.findById(projeto.getId());
+            if (existingProjetoOpt.isPresent()) {
+                Projeto existingProjeto = existingProjetoOpt.get();
+                // Desconecta as equipes antigas do lado da Equipe
+                for (Equipe equipe : new ArrayList<>(existingProjeto.getEquipes())) {
+                    equipe.getProjetos().remove(existingProjeto);
+                }
+            }
+        }
+        projeto.setEquipes(new ArrayList<>()); // Limpa a lista antes de adicionar novas
+        if (equipesSelecionadas != null) {
+            for (Equipe equipe : equipesSelecionadas) {
+                projeto.adicionarEquipe(equipe); // Usa o método utilitário para manter a bidirecionalidade
+            }
+        }
+
+
+        // Verificar o perfil do gerente
         if (projeto.getGerenteResponsavel() != null) {
             Optional<Usuario> gerenteOpt = usuarioRepository.findById(projeto.getGerenteResponsavel().getId());
             if (gerenteOpt.isEmpty() || gerenteOpt.get().getPerfil() != PerfilUsuario.GERENTE) {
@@ -95,6 +148,14 @@ public class ProjetoController {
     @GetMapping("/deletar/{id}")
     public String deletarProjeto(@PathVariable("id") Long id, RedirectAttributes attributes) {
         try {
+            Optional<Projeto> projetoOptional = projetoRepository.findById(id);
+            if (projetoOptional.isPresent()) {
+                Projeto projeto = projetoOptional.get();
+                for (Equipe equipe : new ArrayList<>(projeto.getEquipes())) {
+                    equipe.getProjetos().remove(projeto); // Remove o projeto do lado da equipe
+                }
+                projeto.getEquipes().clear(); // Limpa a lista de equipes do projeto
+            }
             projetoRepository.deleteById(id);
             attributes.addFlashAttribute("mensagemSucesso", "Projeto deletado com sucesso!");
         } catch (Exception e) {

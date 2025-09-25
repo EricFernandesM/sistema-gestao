@@ -1,13 +1,14 @@
 package com.example;
 
-import com.example.PerfilUsuario;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "usuarios")
@@ -17,30 +18,40 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O nome completo é obrigatório.")
+    @Size(min = 3, max = 100, message = "O nome completo deve ter entre 3 e 100 caracteres.")
     private String nomeCompleto;
+
+    @NotBlank(message = "O CPF é obrigatório.")
+    @Size(min = 11, max = 11, message = "O CPF deve ter 11 dígitos.")
+    @Column(unique = true) // CPF deve ser único
     private String cpf;
+
+    @NotBlank(message = "O email é obrigatório.")
+    @Email(message = "Formato de email inválido.")
+    @Column(unique = true) // Email deve ser único
     private String email;
+
+    @NotBlank(message = "O cargo é obrigatório.")
     private String cargo;
+
+    @NotBlank(message = "O login é obrigatório.")
+    @Column(unique = true) // Login deve ser único
     private String login;
-    private String senha;
-    
+
+    @NotBlank(message = "A senha é obrigatória.")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
+    private String senha; // Em um sistema real, a senha deveria ser criptografada!
+
+    @NotNull(message = "O perfil do usuário é obrigatório.")
     @Enumerated(EnumType.STRING)
     private PerfilUsuario perfil;
 
-    // Construtor vazio (obrigatório pelo JPA)
-    public Usuario() {
-    }
-
-    // Construtor com argumentos (para criar usuários na classe Main e em outros lugares)
-    public Usuario(String nomeCompleto, String cpf, String email, String cargo, String login, String senha, PerfilUsuario perfil) {
-        this.nomeCompleto = nomeCompleto;
-        this.cpf = cpf;
-        this.email = email;
-        this.cargo = cargo;
-        this.login = login;
-        this.senha = senha;
-        this.perfil = perfil;
-    }
+    // <<<<<<<<<<< NOVO: Relacionamento ManyToMany com Equipe >>>>>>>>>>>>>
+    // mappedBy indica que a propriedade 'membros' na entidade Equipe é o lado "proprietário"
+    // e esta é a parte "inversa".
+    @ManyToMany(mappedBy = "membros")
+    private List<Equipe> equipes = new ArrayList<>();
 
 
    // ===== GETTERS E SETTERS (Necessários para o JPA) =====
@@ -107,5 +118,27 @@ public class Usuario {
 
     public void setPerfil(PerfilUsuario perfil) {
         this.perfil = perfil;
+    }
+
+    public List<Equipe> getEquipes() {
+        return equipes;
+    }
+
+    public void setEquipes(List<Equipe> equipes) {
+        this.equipes = equipes;
+    }
+
+    // Sobrescrever equals e hashCode (já deve ter para Id, mas é bom verificar)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

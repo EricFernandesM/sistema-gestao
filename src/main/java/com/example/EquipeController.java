@@ -1,86 +1,123 @@
-package com.example; // Mantenha seu pacote original
+package com.example; 
 
-import com.example.Equipe;
-import com.example.EquipeRepository;
-
-import jakarta.validation.Valid; // Importe esta anotação para validação
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult; // Importe para lidar com resultados de validação
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable; // Importe para capturar IDs da URL
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping; // Importe para agrupar as rotas
-import org.springframework.web.servlet.mvc.support.RedirectAttributes; // Importe para mensagens flash
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List; // Importe para listas
-import java.util.Optional; // Importe para lidar com a ausência de um ID no banco
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/equipes") // Agrupa todas as rotas de equipes sob /equipes
+@RequestMapping("/equipes")
 public class EquipeController {
 
     @Autowired
     private EquipeRepository equipeRepository;
 
-    // 1. Método para MOSTRAR a lista de todas as equipes
-    @GetMapping // Acessível via /equipes
+    @Autowired
+    private UsuarioRepository usuarioRepository; // Injetar o repositório de Usuario
+
+    // 1. Exibir todas as equipes
+    @GetMapping
     public String listarEquipes(Model model) {
         List<Equipe> equipes = equipeRepository.findAll();
         model.addAttribute("equipes", equipes);
-        return "lista-equipes"; // Aponta para o arquivo lista-equipes.html
+        return "lista-equipes"; // Seu template HTML de listagem
     }
 
-    // 2. Método para MOSTRAR o formulário de CRIAÇÃO de uma nova equipe
-    @GetMapping("/nova") // Acessível via /equipes/nova
-    public String mostrarFormularioDeEquipe(Model model) {
-        model.addAttribute("equipe", new Equipe()); // Cria uma nova equipe vazia
-        return "form-equipe"; // Aponta para o arquivo form-equipe.html
+    // Método auxiliar para adicionar objetos comuns ao modelo (como lista de usuários)
+    private void addCommonAttributes(Model model) {
+        List<Usuario> usuarios = usuarioRepository.findAll(); // Buscar todos os usuários
+        model.addAttribute("usuarios", usuarios); // Disponibiliza todos os usuários para seleção
     }
 
-    // 3. Método para MOSTRAR o formulário de EDIÇÃO de uma equipe existente
-    // Acessível via /equipes/editar/1, /equipes/editar/2, etc.
+    // 2. Exibir formulário para nova equipe
+    @GetMapping("/novo")
+    public String exibirFormularioNovaEquipe(Model model) {
+        model.addAttribute("equipe", new Equipe());
+        addCommonAttributes(model); // Adiciona usuários ao modelo
+        return "form-equipe"; // Seu template HTML de formulário
+    }
+
+    // 3. Exibir formulário para editar equipe existente
     @GetMapping("/editar/{id}")
     public String exibirFormularioEdicaoEquipe(@PathVariable("id") Long id, Model model, RedirectAttributes attributes) {
-        Optional<Equipe> equipeOptional = equipeRepository.findById(id); // Busca a equipe pelo ID
-
+        Optional<Equipe> equipeOptional = equipeRepository.findById(id);
         if (equipeOptional.isPresent()) {
-            model.addAttribute("equipe", equipeOptional.get()); // Adiciona a equipe encontrada ao modelo
-            return "form-equipe"; // Reutiliza o mesmo template de formulário para edição
+            model.addAttribute("equipe", equipeOptional.get());
+            addCommonAttributes(model); // Adiciona usuários ao modelo
+            return "form-equipe"; // Reutiliza o mesmo template de formulário
         } else {
-            // Se a equipe não for encontrada, redireciona com uma mensagem de erro
             attributes.addFlashAttribute("mensagemErro", "Equipe não encontrada para edição.");
             return "redirect:/equipes";
         }
     }
 
-    // 4. Método para SALVAR/ATUALIZAR a equipe (recebe dados do formulário)
-    // Este método lida tanto com a criação quanto com a edição
-    @PostMapping // Acessível via POST para /equipes
-    public String salvarEquipe(@Valid @ModelAttribute("equipe") Equipe equipe, BindingResult result, RedirectAttributes attributes) {
-        // Verifica se há erros de validação (ex: @NotBlank, @Size na classe Equipe)
+    // 4. Processar o formulário (salvar novo ou atualizar existente)
+    @PostMapping
+    public String salvarEquipe(@Valid @ModelAttribute("equipe") Equipe equipe, BindingResult result,
+                               @RequestParam(value = "membroIds", required = false) List<Long> membroIds, // <<<<< NOVO: Captura os IDs dos membros
+                               RedirectAttributes attributes, Model model) {
+        
         if (result.hasErrors()) {
-            // Se houver erros, retorna ao formulário para que o usuário os corrija
-            return "form-equipe";
+            addCommonAttributes(model); // Precisa adicionar novamente se retornar para o formulário com erros
+            return "form-equipe"; // Retorna ao formulário com os erros
         }
 
-        equipeRepository.save(equipe); // O JPA se encarrega de salvar (se id nulo) ou atualizar (se id presente)
-        attributes.addFlashAttribute("mensagemSucesso", "Equipe salva com sucesso!"); // Mensagem de sucesso
-        return "redirect:/equipes"; // Redireciona para a página de listagem
+        List<Usuario> membrosSelecionados = null;
+        if (membroIds != null && !membroIds.isEmpty()) {
+            membrosSelecionados = usuarioRepository.findAllById(membroIds);
+        }
+
+        // Limpa os membros existentes para evitar duplicação ou persistência de membros removidos
+        // Se for uma equipe existente, desconecte os membros antigos antes de adicionar os novos
+        if (equipe.getId() != null) {
+            Optional<Equipe> existingEquipeOpt = equipeRepository.findById(equipe.getId());
+            if (existingEquipeOpt.isPresent()) {
+                Equipe existingEquipe = existingEquipeOpt.get();
+                // Desconecta os membros antigos do lado do Usuario
+                for (Usuario membro : new ArrayList<>(existingEquipe.getMembros())) {
+                    membro.getEquipes().remove(existingEquipe);
+                }
+            }
+        }
+        equipe.setMembros(new ArrayList<>()); // Limpa a lista antes de adicionar novos
+        if (membrosSelecionados != null) {
+            for (Usuario membro : membrosSelecionados) {
+                equipe.adicionarMembro(membro); // Usa o método utilitário para manter a bidirecionalidade
+            }
+        }
+
+        equipeRepository.save(equipe);
+        attributes.addFlashAttribute("mensagemSucesso", "Equipe salva com sucesso!");
+        return "redirect:/equipes";
     }
 
-    // 5. Método para DELETAR uma equipe
-    // Acessível via /equipes/deletar/1, /equipes/deletar/2, etc. (normalmente chamado por um link)
+    // 5. Método para deletar uma equipe
     @GetMapping("/deletar/{id}")
     public String deletarEquipe(@PathVariable("id") Long id, RedirectAttributes attributes) {
         try {
+
+            Optional<Equipe> equipeOptional = equipeRepository.findById(id);
+            if (equipeOptional.isPresent()) {
+                Equipe equipe = equipeOptional.get();
+                for (Usuario membro : new ArrayList<>(equipe.getMembros())) {
+                    membro.getEquipes().remove(equipe); // Remove a equipe do lado do usuário
+                }
+                equipe.getMembros().clear(); // Limpa a lista de membros da equipe
+            }
+
             equipeRepository.deleteById(id);
             attributes.addFlashAttribute("mensagemSucesso", "Equipe deletada com sucesso!");
         } catch (Exception e) {
-            attributes.addFlashAttribute("mensagemErro", "Erro ao deletar equipe. Verifique se não há dependências.");
+            attributes.addFlashAttribute("mensagemErro", "Erro ao deletar equipe. Verifique se não há dependências. " + e.getMessage());
         }
-        return "redirect:/equipes"; // Redireciona para a página de listagem
+        return "redirect:/equipes";
     }
 }

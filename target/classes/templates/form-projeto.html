@@ -15,44 +15,36 @@
             <div class="mb-3">
                 <label for="nome" class="form-label">Nome do Projeto:</label>
                 <input type="text" id="nome" th:field="*{nome}" class="form-control"
-                        th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" required />
+                       th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" required />
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
                     Erro no nome.
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="gerenteResponsavel" class="form-label">Gerente Responsável:</label>
-                <select id="gerenteResponsavel" th:field="*{gerenteResponsavel}" class="form-select"
-                        th:classappend="${#fields.hasErrors('gerenteResponsavel')} ? 'is-invalid' : ''" required>
-                    <option value="">Selecione um gerente</option>
-                    <option th:each="gerente : ${gerentes}"
-                            th:value="${gerente.id}"
-                            th:text="${gerente.nomeCompleto}"
-                            th:selected="${projeto.gerenteResponsavel != null and projeto.gerenteResponsavel.id == gerente.id}">
-                        Gerente Nome
-                    </option>
-                </select>
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('gerenteResponsavel')}" th:errors="*{gerenteResponsavel}">
-                    Erro no gerente.
+                <label for="descricao" class="form-label">Descrição:</label>
+                <textarea id="descricao" th:field="*{descricao}" class="form-control" rows="3"
+                          th:classappend="${#fields.hasErrors('descricao')} ? 'is-invalid' : ''"></textarea>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}">
+                    Erro na descrição.
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="dataInicio" class="form-label">Data de Início:</label>
                 <input type="date" id="dataInicio" th:field="*{dataInicio}" class="form-control"
-                        th:classappend="${#fields.hasErrors('dataInicio')} ? 'is-invalid' : ''" required />
+                       th:classappend="${#fields.hasErrors('dataInicio')} ? 'is-invalid' : ''" required />
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('dataInicio')}" th:errors="*{dataInicio}">
                     Erro na data de início.
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="dataTerminoPrevista" class="form-label">Previsão de Término:</label>
+                <label for="dataTerminoPrevista" class="form-label">Data de Término Prevista:</label>
                 <input type="date" id="dataTerminoPrevista" th:field="*{dataTerminoPrevista}" class="form-control"
-                        th:classappend="${#fields.hasErrors('dataTerminoPrevista')} ? 'is-invalid' : ''" required />
+                       th:classappend="${#fields.hasErrors('dataTerminoPrevista')} ? 'is-invalid' : ''" />
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('dataTerminoPrevista')}" th:errors="*{dataTerminoPrevista}">
-                    Erro na previsão de término.
+                    Erro na data de término.
                 </div>
             </div>
 
@@ -61,10 +53,9 @@
                 <select id="status" th:field="*{status}" class="form-select"
                         th:classappend="${#fields.hasErrors('status')} ? 'is-invalid' : ''" required>
                     <option value="">Selecione um status</option>
-                    <option th:each="statusEnum : ${statusProjetoEnum}"
-                            th:value="${statusEnum}"
-                            th:text="${statusEnum.name().replace('_', ' ')}"
-                            th:selected="${projeto.status != null and projeto.status == statusEnum}">
+                    <option th:each="statusOption : ${statusProjetoEnum}"
+                            th:value="${statusOption}"
+                            th:text="${statusOption.name}">
                         Status
                     </option>
                 </select>
@@ -73,7 +64,35 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="mb-3">
+                <label for="gerenteResponsavel" class="form-label">Gerente Responsável:</label>
+                <select id="gerenteResponsavel" th:field="*{gerenteResponsavel.id}" class="form-select"
+                        th:classappend="${#fields.hasErrors('gerenteResponsavel')} ? 'is-invalid' : ''" required>
+                    <option value="">Selecione um gerente</option>
+                    <option th:each="gerente : ${gerentes}"
+                            th:value="${gerente.id}"
+                            th:text="${gerente.nomeCompleto + ' (' + gerente.perfil + ')'}">
+                        Nome do Gerente
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('gerenteResponsavel')}" th:errors="*{gerenteResponsavel}">
+                    Erro no gerente.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="equipes" class="form-label">Equipes do Projeto:</label>
+                <select id="equipes" name="equipeIds" multiple class="form-select" size="8">
+                    <option th:each="equipe : ${equipes}"
+                            th:value="${equipe.id}"
+                            th:text="${equipe.nome}"
+                            th:selected="${projeto.equipes != null and projeto.equipes.contains(equipe)}">
+                        Nome da Equipe
+                    </option>
+                </select>
+                <div class="form-text text-muted">Use Ctrl/Cmd para selecionar múltiplas equipes.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Projeto</button>
             <a th:href="@{/projetos}" class="btn btn-secondary">Cancelar</a>
         </form>
     </div>

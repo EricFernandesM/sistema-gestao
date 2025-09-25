@@ -1,0 +1,42 @@
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos gerados pelo Maven
+/target/
+*.jar
+*.war
+*.ear
+
+# Arquivos de configuração de IDEs
+# VS Code
+.vscode/
+# IntelliJ
+.idea/
+*.iml
+*.iws
+# Eclipse
+.classpath
+.project
+.settings/
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+.nb-gradle/
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos de configuração sensíveis (IMPORTANTE!)
+# Se o seu application.properties contém senhas de banco de dados
+# ou outras chaves secretas, é uma boa prática ignorá-lo.
+# Em vez disso, você pode criar um arquivo 'application.properties.example'
+# com a estrutura, mas sem os valores, e adicionar este ao Git.
+# application.properties
+
+# Outros
+/temp/
+*.tmp

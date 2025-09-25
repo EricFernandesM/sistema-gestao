@@ -16,7 +16,9 @@ public class Projeto {
 
     private String nome;
 
-    // ESTE É O CAMPO PROBLEMÁTICO: gerenteResponsavel
+    @Column(columnDefinition = "TEXT")
+    private String descricao;
+
     @ManyToOne(fetch = FetchType.LAZY) // Um projeto tem um gerente, um gerente pode ter vários projetos
     @JoinColumn(name = "gerente_id", nullable = false)
     @NotNull(message = "O gerente responsável não pode ser nulo.")
@@ -32,19 +34,18 @@ public class Projeto {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "projeto_equipes",
-        joinColumns = @JoinColumn(name = "id_projeto"),
-        inverseJoinColumns = @JoinColumn(name = "id_equipe")
+        joinColumns = @JoinColumn(name = "projeto_id"),
+        inverseJoinColumns = @JoinColumn(name = "equipe_id")
     )
     private List<Equipe> equipes = new ArrayList<>();
 
     // Construtores (verifique se o construtor que você está usando
-    // no Main.java - se ainda existir algo - ou em outro lugar
-    // está recebendo o Usuario corretamente)
     public Projeto() {
     }
 
     public Projeto(String nome, Usuario gerenteResponsavel, LocalDate dataInicio, LocalDate dataTerminoPrevista, StatusProjeto status) {
         this.nome = nome;
+        this.descricao = descricao;
         this.gerenteResponsavel = gerenteResponsavel;
         this.dataInicio = dataInicio;
         this.dataTerminoPrevista = dataTerminoPrevista;
@@ -118,4 +119,12 @@ public class Projeto {
         }
         this.equipes.add(equipe);
     }
+
+    public String getDescricao() {
+    return descricao;
+}
+
+public void setDescricao(String descricao) {
+    this.descricao = descricao;
+}
 }

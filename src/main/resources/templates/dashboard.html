@@ -25,7 +25,7 @@
             <h2>Gerenciar</h2>
             <div class="actions-nav">
                 <a th:href="@{/projetos/novo}">+ Projeto</a>
-                <a th:href="@{/equipes/nova}">+ Equipe</a>
+                <a th:href="@{/equipes/novo}">+ Equipe</a>
                 <a th:href="@{/usuarios/novo}">+ Usuário</a>
             </div>
         </div>
@@ -62,6 +62,7 @@
                     <tr>
                         <th>Nome do Projeto</th>
                         <th>Gerente Responsável</th>
+                        <th>Equipes</th>
                         <th>Data de Início</th>
                         <th>Status</th>
                     </tr>
@@ -70,6 +71,10 @@
                     <tr th:each="projeto : ${projetosPlanejados}">
                         <td th:text="${projeto.nome}"></td>
                         <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td> <span th:if="${#lists.isEmpty(projeto.equipes)}">Nenhuma equipe</span>
+                            <ul th:if="${!#lists.isEmpty(projeto.equipes)}" class="list-unstyled mb-0">
+                                <li th:each="equipe : ${projeto.equipes}" th:text="${equipe.nome}">Nome da Equipe</li>
+                            </ul>
                         <td th:text="${projeto.dataInicio}"></td>
                         <td th:text="${projeto.status}"></td>
                     </tr>
@@ -87,6 +92,7 @@
                     <tr>
                         <th>Nome do Projeto</th>
                         <th>Gerente Responsável</th>
+                        <th>Equipes</th>
                         <th>Previsão de Término</th>
                         <th>Status</th>
                     </tr>
@@ -95,6 +101,10 @@
                     <tr th:each="projeto : ${projetosEmAndamento}">
                         <td th:text="${projeto.nome}"></td>
                         <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td> <span th:if="${#lists.isEmpty(projeto.equipes)}">Nenhuma equipe</span>
+                            <ul th:if="${!#lists.isEmpty(projeto.equipes)}" class="list-unstyled mb-0">
+                                <li th:each="equipe : ${projeto.equipes}" th:text="${equipe.nome}">Nome da Equipe</li>
+                            </ul>
                         <td th:text="${projeto.dataTerminoPrevista}"></td>
                         <td th:text="${projeto.status}"></td>
                     </tr>
@@ -112,7 +122,8 @@
                     <tr>
                         <th>Nome do Projeto</th>
                         <th>Gerente Responsável</th>
-                        <th>Data de Término Prevista</th>
+                        <th>Equipes</th>
+                        <th>Previsão de Término</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -120,6 +131,10 @@
                     <tr th:each="projeto : ${projetosConcluidos}">
                         <td th:text="${projeto.nome}"></td>
                         <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td> <span th:if="${#lists.isEmpty(projeto.equipes)}">Nenhuma equipe</span>
+                            <ul th:if="${!#lists.isEmpty(projeto.equipes)}" class="list-unstyled mb-0">
+                                <li th:each="equipe : ${projeto.equipes}" th:text="${equipe.nome}">Nome da Equipe</li>
+                            </ul>
                         <td th:text="${projeto.dataTerminoPrevista}"></td>
                         <td th:text="${projeto.status}"></td>
                     </tr>

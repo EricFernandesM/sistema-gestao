@@ -16,33 +16,39 @@
             <span th:text="${mensagemErro}"></span>
         </div>
 
-        <a th:href="@{/}" class="btn btn-primary mb-3">Inicio</a>
+        <a th:href="@{/}" class="btn btn-secondary mb-3 me-2">Início</a>
+        <a th:href="@{/equipes/novo}" class="btn btn-primary mb-3">Nova Equipe</a>
 
-        <a th:href="@{/equipes/nova}" class="btn btn-primary mb-3">Nova Equipe</a>
-
-
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Descrição</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="equipe : ${equipes}">
-                    <td th:text="${equipe.id}">1</td>
-                    <td th:text="${equipe.nome}">Nome da Equipe</td>
-                    <td th:text="${equipe.descricao}">Descrição da Equipe</td>
-                    <td>
-                        <a th:href="@{/equipes/editar/{id}(id=${equipe.id})}" class="btn btn-warning btn-sm">Editar</a>
-                        <a th:href="@{/equipes/deletar/{id}(id=${equipe.id})}" class="btn btn-danger btn-sm"
-                           onclick="return confirm('Tem certeza que deseja deletar esta equipe?');">Deletar</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome da Equipe</th>
+                        <th>Descrição</th>
+                        <th>Membros</th> <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="equipe : ${equipes}">
+                        <td th:text="${equipe.id}">1</td>
+                        <td th:text="${equipe.nome}">Equipe Alpha</td>
+                        <td th:text="${equipe.descricao}">Descrição da equipe.</td>
+                        <td>
+                            <span th:if="${#lists.isEmpty(equipe.membros)}">Nenhum membro</span>
+                            <ul th:if="${!#lists.isEmpty(equipe.membros)}" class="list-unstyled mb-0">
+                                <li th:each="membro : ${equipe.membros}" th:text="${membro.nomeCompleto}">Membro Nome</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <a th:href="@{/equipes/editar/{id}(id=${equipe.id})}" class="btn btn-warning btn-sm">Editar</a>
+                            <a th:href="@{/equipes/deletar/{id}(id=${equipe.id})}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Tem certeza que deseja deletar esta equipe e desvincular seus membros?');">Deletar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
