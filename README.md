@@ -48,8 +48,8 @@ Siga estes passos para preparar o ambiente antes de executar a aplicação pela 
 ### 1. Clonar o Repositório
 Abra um terminal e clone o projeto para a sua máquina local (se o código estiver em um repositório).
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO_GIT>
-cd nome-da-pasta-do-projeto
+git clone https://github.com/EricFernandesM/sistema-gestao
+cd sistema-gestao
 ```
 
 ### 2. Configurar o Banco de Dados
