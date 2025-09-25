@@ -1,13 +1,13 @@
-package com.example; // Ajuste o pacote
+package com.example; 
 
 import com.example.PerfilUsuario;
-import com.example.Projeto.StatusProjeto; // Importa o enum StatusProjeto aninhado
+import com.example.Projeto.StatusProjeto; 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError; // Para adicionar erros específicos
+import org.springframework.validation.FieldError; 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -67,28 +67,6 @@ public class ProjetoController {
         }
     }
 
-    /* List<Equipe> equipesSelecionadas = null;
-        if (equipeIds != null && !equipeIds.isEmpty()) {
-            equipesSelecionadas = equipeRepository.findAllById(equipeIds);
-        }
-
-        // Limpa as equipes existentes para evitar duplicação ou persistência de equipes removidas
-        if (projeto.getId() != null) {
-            Optional<Projeto> existingProjetoOpt = projetoRepository.findById(projeto.getId());
-            if (existingProjetoOpt.isPresent()) {
-                Projeto existingProjeto = existingProjetoOpt.get();
-                // Desconecta as equipes antigas do lado da Equipe
-                for (Equipe equipe : new ArrayList<>(existingProjeto.getEquipes())) {
-                    equipe.getProjetos().remove(existingProjeto);
-                }
-            }
-        }
-        projeto.setEquipes(new ArrayList<>()); // Limpa a lista antes de adicionar novas
-        if (equipesSelecionadas != null) {
-            for (Equipe equipe : equipesSelecionadas) {
-                projeto.adicionarEquipe(equipe); // Usa o método utilitário para manter a bidirecionalidade
-            }
-        } */
     // 4. Processar o formulário (salvar novo ou atualizar existente)
     @PostMapping
     public String salvarProjeto(@Valid @ModelAttribute("projeto") Projeto projeto, 

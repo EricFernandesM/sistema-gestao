@@ -62,7 +62,7 @@ public class EquipeController {
     // 4. Processar o formulário (salvar novo ou atualizar existente)
     @PostMapping
     public String salvarEquipe(@Valid @ModelAttribute("equipe") Equipe equipe, BindingResult result,
-                               @RequestParam(value = "membroIds", required = false) List<Long> membroIds, // <<<<< NOVO: Captura os IDs dos membros
+                               @RequestParam(value = "membroIds", required = false) List<Long> membroIds,
                                RedirectAttributes attributes, Model model) {
         
         if (result.hasErrors()) {

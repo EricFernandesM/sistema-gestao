@@ -47,7 +47,6 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private PerfilUsuario perfil;
 
-    // <<<<<<<<<<< NOVO: Relacionamento ManyToMany com Equipe >>>>>>>>>>>>>
     // mappedBy indica que a propriedade 'membros' na entidade Equipe é o lado "proprietário"
     // e esta é a parte "inversa".
     @ManyToMany(mappedBy = "membros")

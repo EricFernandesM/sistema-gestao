@@ -1,7 +1,7 @@
-package com.example; // PACOTE CORRETO
+package com.example; 
 
-import com.example.Projeto; // Importa a classe Projeto (para JpaRepository)
-import com.example.Projeto.StatusProjeto; // Importa o enum StatusProjeto aninhado
+import com.example.Projeto; 
+import com.example.Projeto.StatusProjeto; 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

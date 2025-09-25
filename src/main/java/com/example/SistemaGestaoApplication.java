@@ -1,4 +1,4 @@
-package com.example; // Garanta que este pacote é o mesmo das suas outras classes
+package com.example; 
 
 import com.example.Projeto.StatusProjeto; 
 import org.springframework.boot.SpringApplication;
