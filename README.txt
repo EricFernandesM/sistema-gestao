@@ -62,7 +62,7 @@ Abra o **pgAdmin 4**, conecte-se ao seu servidor e crie um novo banco de dados c
 Dentro do banco `gestao_projetos`, abra a **Query Tool** (Ferramenta de Consulta) e execute o script SQL abaixo para criar todas as tabelas necessárias:
 
 ```sql
--- Apaga as tabelas antigas se existirem, para garantir uma instalação limpa
+-- Apaga as tabelas antigas se existirem, na ordem correta
 DROP TABLE IF EXISTS projeto_equipes;
 DROP TABLE IF EXISTS equipe_membros;
 DROP TABLE IF EXISTS projetos;
@@ -96,7 +96,10 @@ CREATE TABLE projetos (
     data_inicio DATE,
     data_termino_prevista DATE,
     status VARCHAR(50),
-    id_gerente INTEGER REFERENCES usuarios(id)
+    id_gerente INTEGER,
+    CONSTRAINT fk_gerente
+        FOREIGN KEY(id_gerente) 
+        REFERENCES usuarios(id)
 );
 
 -- Cria a tabela de associação Equipe <-> Membros(Usuários)
@@ -108,10 +111,13 @@ CREATE TABLE equipe_membros (
 
 -- Cria a tabela de associação Projeto <-> Equipes
 CREATE TABLE projeto_equipes (
-    id_projeto INTEGER REFERENCES projetos(id) ON DELETE CASCADE,
-    id_equipe INTEGER REFERENCES equipes(id) ON DELETE CASCADE,
-    PRIMARY KEY (id_projeto, id_equipe)
+    projeto_id BIGINT REFERENCES projetos(id) ON DELETE CASCADE,
+    equipe_id BIGINT REFERENCES equipes(id) ON DELETE CASCADE,
+    PRIMARY KEY (projeto_id, equipe_id)
 );
+
+-- Mensagem de sucesso
+SELECT 'Tabelas criadas com sucesso!' AS resultado;
 ```
 
 ### 3. Configurar a Aplicação
