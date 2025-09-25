@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${projeto.id != null ? 'Editar Projeto' : 'Novo Projeto'}">Formulário de Projeto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 th:text="${projeto.id != null ? 'Editar Projeto' : 'Novo Projeto'}">Formulário de Projeto</h1>
+
+        <form th:action="${projeto.id != null ? '/projetos' : '/projetos'}" th:object="${projeto}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome do Projeto:</label>
+                <input type="text" id="nome" th:field="*{nome}" class="form-control"
+                        th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" required />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
+                    Erro no nome.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="gerenteResponsavel" class="form-label">Gerente Responsável:</label>
+                <select id="gerenteResponsavel" th:field="*{gerenteResponsavel}" class="form-select"
+                        th:classappend="${#fields.hasErrors('gerenteResponsavel')} ? 'is-invalid' : ''" required>
+                    <option value="">Selecione um gerente</option>
+                    <option th:each="gerente : ${gerentes}"
+                            th:value="${gerente.id}"
+                            th:text="${gerente.nomeCompleto}"
+                            th:selected="${projeto.gerenteResponsavel != null and projeto.gerenteResponsavel.id == gerente.id}">
+                        Gerente Nome
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('gerenteResponsavel')}" th:errors="*{gerenteResponsavel}">
+                    Erro no gerente.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="dataInicio" class="form-label">Data de Início:</label>
+                <input type="date" id="dataInicio" th:field="*{dataInicio}" class="form-control"
+                        th:classappend="${#fields.hasErrors('dataInicio')} ? 'is-invalid' : ''" required />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('dataInicio')}" th:errors="*{dataInicio}">
+                    Erro na data de início.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="dataTerminoPrevista" class="form-label">Previsão de Término:</label>
+                <input type="date" id="dataTerminoPrevista" th:field="*{dataTerminoPrevista}" class="form-control"
+                        th:classappend="${#fields.hasErrors('dataTerminoPrevista')} ? 'is-invalid' : ''" required />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('dataTerminoPrevista')}" th:errors="*{dataTerminoPrevista}">
+                    Erro na previsão de término.
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="status" class="form-label">Status:</label>
+                <select id="status" th:field="*{status}" class="form-select"
+                        th:classappend="${#fields.hasErrors('status')} ? 'is-invalid' : ''" required>
+                    <option value="">Selecione um status</option>
+                    <option th:each="statusEnum : ${statusProjetoEnum}"
+                            th:value="${statusEnum}"
+                            th:text="${statusEnum.name().replace('_', ' ')}"
+                            th:selected="${projeto.status != null and projeto.status == statusEnum}">
+                        Status
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">
+                    Erro no status.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a th:href="@{/projetos}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

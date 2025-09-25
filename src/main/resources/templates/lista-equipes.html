@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Equipes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Equipes Cadastradas</h1>
+
+        <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert">
+            <span th:text="${mensagemSucesso}"></span>
+        </div>
+        <div th:if="${mensagemErro}" class="alert alert-danger" role="alert">
+            <span th:text="${mensagemErro}"></span>
+        </div>
+
+        <a th:href="@{/}" class="btn btn-primary mb-3">Inicio</a>
+
+        <a th:href="@{/equipes/nova}" class="btn btn-primary mb-3">Nova Equipe</a>
+
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="equipe : ${equipes}">
+                    <td th:text="${equipe.id}">1</td>
+                    <td th:text="${equipe.nome}">Nome da Equipe</td>
+                    <td th:text="${equipe.descricao}">Descrição da Equipe</td>
+                    <td>
+                        <a th:href="@{/equipes/editar/{id}(id=${equipe.id})}" class="btn btn-warning btn-sm">Editar</a>
+                        <a th:href="@{/equipes/deletar/{id}(id=${equipe.id})}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('Tem certeza que deseja deletar esta equipe?');">Deletar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

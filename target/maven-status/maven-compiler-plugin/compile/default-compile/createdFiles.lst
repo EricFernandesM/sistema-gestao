@@ -1,0 +1,14 @@
+com\example\Projeto$StatusProjeto.class
+com\example\SistemaGestaoApplication.class
+com\example\DashboardController.class
+com\example\ProjetoController.class
+com\example\Projeto.class
+com\example\ProjetoRepository.class
+com\example\Equipe.class
+com\example\PerfilUsuario.class
+com\example\EquipeRepository.class
+com\example\Usuario.class
+com\example\ConexaoBanco.class
+com\example\EquipeController.class
+com\example\UsuarioRepository.class
+com\example\UsuarioController.class

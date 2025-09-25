@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard - Gestão de Projetos</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .dashboard-container { display: flex; flex-direction: column; gap: 2em; }
+        .overview-cards { display: flex; gap: 1em; }
+        .card { border: 1px solid #ccc; border-radius: 8px; padding: 1em; text-align: center; flex-grow: 1; }
+        .card h2 { margin-top: 0; }
+        .card .count { font-size: 2.5em; font-weight: bold; }
+        .actions-nav { display: flex; gap: 1em; }
+        .actions-nav a { padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+        table { width:100%; border-collapse: collapse; margin-top: 1em; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <h1>Dashboard Principal</h1>
+
+        <div>
+            <h2>Gerenciar</h2>
+            <div class="actions-nav">
+                <a th:href="@{/projetos/novo}">+ Projeto</a>
+                <a th:href="@{/equipes/nova}">+ Equipe</a>
+                <a th:href="@{/usuarios/novo}">+ Usuário</a>
+            </div>
+        </div>
+
+
+        <div>
+            <h2>Visão Geral</h2>
+            <div class="overview-cards">
+                <div class="card">
+                    <h2>Projetos</h2>
+                    <a th:href="@{/projetos}" style="text-decoration: none; color: inherit;">
+                        <span class="count" th:text="${totalProjetos}">0</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <h2>Equipes</h2>
+                    <a th:href="@{/equipes}" style="text-decoration: none; color: inherit;">
+                        <span class="count" th:text="${totalEquipes}">0</span>
+                    </a>
+                </div>
+                <div class="card">
+                    <h2>Usuários</h2>
+                    <a th:href="@{/usuarios}" style="text-decoration: none; color: inherit;">
+                        <span class="count" th:text="${totalUsuarios}">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Projetos: Planejados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome do Projeto</th>
+                        <th>Gerente Responsável</th>
+                        <th>Data de Início</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="projeto : ${projetosPlanejados}">
+                        <td th:text="${projeto.nome}"></td>
+                        <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td th:text="${projeto.dataInicio}"></td>
+                        <td th:text="${projeto.status}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(projetosPlanejados)}">
+                        <td colspan="4">Nenhum projeto planejado no momento.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <h2>Projetos: Em Andamento</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome do Projeto</th>
+                        <th>Gerente Responsável</th>
+                        <th>Previsão de Término</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="projeto : ${projetosEmAndamento}">
+                        <td th:text="${projeto.nome}"></td>
+                        <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td th:text="${projeto.dataTerminoPrevista}"></td>
+                        <td th:text="${projeto.status}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(projetosEmAndamento)}">
+                        <td colspan="4">Nenhum projeto em andamento no momento.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <h2>Projetos: Concluídos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome do Projeto</th>
+                        <th>Gerente Responsável</th>
+                        <th>Data de Término Prevista</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="projeto : ${projetosConcluidos}">
+                        <td th:text="${projeto.nome}"></td>
+                        <td th:text="${projeto.gerenteResponsavel != null ? projeto.gerenteResponsavel.nomeCompleto : 'N/A'}"></td>
+                        <td th:text="${projeto.dataTerminoPrevista}"></td>
+                        <td th:text="${projeto.status}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(projetosConcluidos)}">
+                        <td colspan="4">Nenhum projeto concluído no momento.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    </div>
+
+</body>
+</html>
