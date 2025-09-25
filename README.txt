@@ -151,6 +151,7 @@ Com o ambiente configurado, você pode iniciar a aplicação de duas maneiras:
 
 Após iniciar o servidor, abra seu navegador de internet e acesse as seguintes URLs:
 
+* **Dashboard Principal:** [http://localhost:8080/](http://localhost:8080/)
 * **Lista de Projetos:** [http://localhost:8080/projetos](http://localhost:8080/projetos)
 * **Lista de Equipes:** [http://localhost:8080/equipes](http://localhost:8080/equipes)
 * **Lista de Usuários:** [http://localhost:8080/usuarios](http://localhost:8080/usuarios)
